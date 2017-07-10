@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyc.baojian.mapper.BaoJianMapper">
+      
+      <insert id="saveBaojianProgram" parameterType="com.gyc.dto.baojian">
+          insert into tbl_baojian
+           (
+            user_id,
+            `name`,
+            `desc`,
+            updated_at,
+            created_at,
+            status)
+            values
+           (
+             #{user_id,jdbcType=VARCHAR},
+             #{name,jdbcType=VARCHAR},
+             #{desc,jdbcType=VARCHAR},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER},
+             #{status,jdbcType=INTEGER}
+            )
+      </insert>      
+      
+      <select id="getBaoJianProgram" parameterType="com.gyc.dto.baojian" resultType="com.gyc.dto.baojian">
+           select id as id,
+           name as name,
+           `desc` as `desc`,
+           area_id as area_id,
+           user_id as user_id,
+           status as status,
+           admin_id as admin_id,
+           created_at as created_at,
+           updated_at as updated_at,
+           read_status as read_status
+           from tbl_baojian
+           where 1=1
+           <if test="id!=null and id!=''">
+               and id = #{id}
+           </if>
+           <if test="name!=null and name!=''">
+               and name = #{name}
+           </if> 
+           <if test="updated_at!=null and updated_at!=''">
+               and updated_at = #{updated_at}
+           </if>  
+           <if test="user_id!=null and user_id!=''">
+               and user_id = #{user_id}
+           </if>  
+           <if test="created_at!=null and created_at!=''">
+               and created_at = #{created_at}
+           </if> 
+           limit 1 
+      </select>
+      
+      <insert id="saveSection" parameterType="com.gyc.dto.section">
+           insert into tbl_section
+           (
+            baojian_id,
+            display_order,
+            `name`,
+            `desc`,
+            stage,
+            updated_at,
+            created_at)
+            values
+           (
+             #{baojian_id,jdbcType=INTEGER},
+             #{display_order,jdbcType=VARCHAR},
+             #{name,jdbcType=VARCHAR},
+             #{desc,jdbcType=VARCHAR},
+             #{stage,jdbcType=INTEGER},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert> 
+      
+      <select id="getSection" parameterType="com.gyc.dto.section" resultType="com.gyc.dto.section">
+           select id as id,
+           display_order as display_order,
+           name as name,
+           `desc` as `desc`,
+           baojian_id as baojian_id,
+           stage as stage,
+           created_at as created_at,
+           updated_at as updated_at
+           from tbl_section
+           where 1=1
+           <if test="id!=null and id!=''">
+               and id = #{id}
+           </if>
+           <if test="name!=null and name!=''">
+               and name = #{name}
+           </if> 
+           <if test="updated_at!=null and updated_at!=''">
+               and updated_at = #{updated_at}
+           </if>  
+           <if test="baojian_id!=null and baojian_id!=''">
+               and baojian_id = #{baojian_id}
+           </if>  
+           <if test="created_at!=null and created_at!=''">
+               and created_at = #{created_at}
+           </if> 
+           <if test="stage!=null and stage!=''">
+               and stage = #{stage}
+           </if> 
+          
+      </select>
+      
+      
+      
+      
+        <insert id="saveBaojianFile" parameterType="com.gyc.dto.baojianFile">
+           insert into tbl_baojian_files
+           (
+            section_id,
+            `type`,
+            file_type,
+            src,
+            updated_at,
+            created_at)
+            values
+           (
+             #{section_id,jdbcType=INTEGER},
+             #{type,jdbcType=INTEGER},
+             #{file_type,jdbcType=VARCHAR},
+             #{src,jdbcType=VARCHAR},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert> 
+      
+      <select id="getBaoJianProgramList" parameterType="java.util.Map" resultType="com.gyc.dto.baojian">
+           select id as id,
+           name as name,
+           `desc` as `desc`,
+           area_id as area_id,
+           user_id as user_id,
+           status as status,
+           admin_id as admin_id,
+           created_at as created_at,
+           updated_at as updated_at,
+           read_status as read_status
+           from tbl_baojian
+           where 1=1
+           <if test="id!=null and id!=''">
+               and id = #{id}
+           </if>
+           <if test="name!=null and name!=''">
+               and name = #{name}
+           </if> 
+           <if test="updated_at!=null and updated_at!=''">
+               and updated_at = #{updated_at}
+           </if>  
+           <if test="user_id!=null and user_id!=''">
+               and user_id = #{user_id}
+           </if>  
+           <if test="status!=null and status!=''">
+               and status = #{status}
+           </if>  
+           <if test="read_status!=null and read_status!=''">
+               and read_status = #{read_status}
+           </if> 
+           limit #{limit} offset #{offset}
+      </select>
+  
+       <select id="getBaojianFileList" parameterType="java.lang.Integer" resultType="com.gyc.dto.baojianFile">
+           select id as id,
+           section_id as section_id,
+           src as src,
+           type as type,
+           created_at as created_at,
+           updated_at as updated_at
+           from tbl_baojian_files
+           where  section_id = #{section_id} 
+           limit 100   
+      </select>
+      
+      
+       <select id="getBaojianTips" parameterType="java.lang.String" resultType="java.lang.String">
+           select content as tip
+           from tbl_section_tips
+           where  section_id = #{section_id} 
+           limit 1   
+       </select>
+      
+        <delete id="deleteSection" parameterType="com.gyc.dto.section">
+           delete from tbl_section 
+           where baojian_id = #{baojian_id}
+           and stage = #{stage}
+        </delete> 
+        
+        <update id="updateBaoJian" parameterType="com.gyc.dto.baojian">
+           update tbl_baojian
+           set read_status = #{read_status}
+           where id = #{id}
+      </update>
+      
+         <update id="updateBaoJianStatus" parameterType="com.gyc.dto.baojian">
+           update tbl_baojian
+           set status = #{status}
+           where id = #{id}
+      </update>
+  
+</mapper>

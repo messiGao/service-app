@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyc.article.mapper.ArticleMapper">
+      <select id="getCategories" parameterType="com.gyc.dto.category" resultType="com.gyc.dto.category">
+        select 
+           id,
+           parent_id,
+           name,
+           description,
+           meta_keywords,
+           meta_description,
+           image_main,
+           image_node,
+           banner,
+           sort_val,
+           status,
+           type,
+           created_at,
+           updated_at
+       from cms_category
+       where 1=1
+       <if test="type!=null and type!=''">
+               and type = #{type}
+       </if>
+           limit 100 
+      </select>
+      
+      <select id="getCategorieById" parameterType="java.lang.Integer" resultType="com.gyc.dto.category">
+        select 
+           id,
+           parent_id,
+           name,
+           description,
+           meta_keywords,
+           meta_description,
+           image_main,
+           image_node,
+           banner,
+           sort_val,
+           status,
+           type,
+           created_at,
+           updated_at
+       from cms_category
+       where id = #{category_id}
+           limit 1
+      </select>
+      
+      
+     <select id="getArticles" parameterType="java.util.Map" resultType="com.gyc.dto.article">
+        select 
+            a.id,
+            a.type,
+            a.category_id,
+            a.name,
+            a.summary,
+            a.content,
+            a.meta_keywords,
+            a.meta_description,
+            a.image_main,
+            a.image_node,
+            a.view_count,
+            a.status,
+            a.sort_val,
+            (select  b.name from cms_category b where b.id=a.category_id limit 1) as category_name,
+            a.created_at,
+            a.updated_at
+      from cms_article a
+           where 1=1
+       <if test="category_id!=null and category_id!=''">
+               and a.category_id = #{category_id}
+       </if>
+        <if test="type!=null and type!=''">
+               and a.type = #{type}
+       </if>
+       order by updated_at desc
+           limit  #{limit}  offset #{offset}
+      </select>
+
+     <select id="getArticle" parameterType="com.gyc.dto.article" resultType="com.gyc.dto.article">
+        select 
+            id,
+            category_id,
+            name,
+            summary,
+            content,
+            meta_keywords,
+            meta_description,
+            image_main,
+            image_node,
+            view_count,
+            status,
+            sort_val,
+            created_at,
+            updated_at
+      from cms_article
+           where 1=1
+       <if test="id!=null and id!=''">
+               and id = #{id}
+       </if>
+           limit  1
+      </select>
+      
+     <select id="getArticleNew"  resultType="com.gyc.dto.article">
+        select 
+            a.id,
+            a.type,
+            a.category_id,
+            a.name,
+            a.summary,
+            a.content,
+            a.meta_keywords,
+            a.meta_description,
+            a.image_main,
+            a.image_node,
+            a.view_count,
+            a.status,
+            a.sort_val,
+            (select  b.name from cms_category b where b.id=a.category_id limit 1) as category_name,
+            a.created_at,
+            a.updated_at
+      from cms_article a
+           where 1=1
+       order by a.updated_at desc
+           limit  10
+      </select>
+     
+     <insert id="collectArticle" parameterType="com.gyc.dto.collectArticle">
+           insert into tbl_article_collect
+           (
+            user_id,
+            article_id,
+            updated_at,
+            created_at)
+            values
+           (
+             #{user_id,jdbcType=INTEGER},
+             #{article_id,jdbcType=INTEGER},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert>      
+      
+    <select id="getArticleCollect"  parameterType="com.gyc.dto.collectArticle" resultType="com.gyc.dto.collectArticle">
+        select 
+            user_id,
+            article_id,
+            created_at,
+            updated_at
+      from tbl_article_collect
+           where article_id = #{article_id}  
+           and user_id = #{user_id}
+      </select>
+     
+      
+     <select id="getNewArticlesByType" parameterType="java.util.Map" resultType="com.gyc.dto.article">
+        select 
+            a.id,
+            a.category_id,
+            a.name,
+            a.summary,
+            a.content,
+            a.meta_keywords,
+            a.meta_description,
+            a.image_main,
+            a.image_node,
+            a.view_count,
+            a.status,
+            a.sort_val,
+            a.created_at,
+            a.updated_at,
+            b.name as category_name
+      from cms_article a ,cms_category b
+           where a.category_id = b.id
+       <if test="type!=null and type!=''">
+               and b.type = #{type}
+       </if>
+           order by a.updated_at desc
+           limit #{limit} offset #{offset}
+      </select>
+      
+     <select id="getArticlesByKeyWord" parameterType="com.gyc.dto.article" resultType="com.gyc.dto.article">
+       select 
+            a.id,
+            a.type,
+            a.category_id,
+            a.name,
+            a.summary,
+            a.content,
+            a.meta_keywords,
+            a.meta_description,
+            a.image_main,
+            a.image_node,
+            a.view_count,
+            a.status,
+            a.sort_val,
+            (select  b.name from cms_category b where b.id=a.category_id limit 1) as category_name,
+            a.created_at,
+            a.updated_at
+      from cms_article a
+           where a.name like #{name}           
+      </select>
+      
+      <delete id="deleteCollectArticle" parameterType="com.gyc.dto.collectArticle">
+           delete from tbl_article_collect
+           where article_id = #{article_id}  
+           and user_id = #{user_id} 
+      </delete>   
+      
+      
+      
+     <select id="getCollectarticles" parameterType="java.util.Map" resultType="com.gyc.dto.article">
+        select 
+            a.id,
+            a.category_id,
+            a.name,
+            a.summary,
+            a.content,
+            a.meta_keywords,
+            a.meta_description,
+            a.image_main,
+            a.image_node,
+            a.view_count,
+            a.status,
+            a.sort_val,
+            a.created_at,
+            a.updated_at
+      from cms_article a ,tbl_article_collect b
+           where a.id = b.article_id
+            and b.user_id = #{user_id}
+            limit #{limit} offset #{offset}
+      </select>   
+</mapper>

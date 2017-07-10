@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyc.expert.mapper.ExpertMapper">
+      <select id="getExpertList" parameterType="java.util.Map" resultType="com.gyc.dto.expert">
+           select id as id,
+           `name` as name,
+           phone as phone,
+           work_time as work_time,
+           `description` as description,
+           created_at as created_at,
+           updated_at as updated_at
+           from expert
+           where 1=1
+           limit  #{limit}  offset #{offset}
+      </select>
+      
+       <select id="getExpertByName"  resultType="com.gyc.dto.expert">
+           select id as id,
+           `name` as name,
+           phone as phone,
+           work_time as work_time,
+           `description` as description,
+           created_at as created_at,
+           updated_at as updated_at
+           from expert
+           where name = #{name}
+      </select>
+      
+      
+        <insert id="saveExpert" parameterType="com.gyc.dto.expert">
+          insert into expert(
+              name,
+              phone,
+              work_time,
+              description,
+              created_at,
+              updated_at
+              )values(
+             #{name,jdbcType=VARCHAR},
+             #{phone,jdbcType=VARCHAR},
+             #{work_time,jdbcType=VARCHAR},
+             #{description,jdbcType=VARCHAR},
+             #{created_at,jdbcType=INTEGER},
+             #{updated_at,jdbcType=INTEGER}
+            )
+      </insert> 
+      
+      <update id="updateExpert" parameterType="com.gyc.dto.expert">
+           update expert 
+           set name = #{name}
+           <if test="phone!=null and phone!=''">
+               ,phone = #{phone}
+           </if>  
+           <if test="updated_at!=null and updated_at!=''">  
+               ,updated_at = #{updated_at}
+           </if> 
+           <if test="description!=null and description!=''">  
+               ,description = #{description}
+           </if> 
+           <if test="work_time!=null and work_time!=''">  
+               ,work_time = #{work_time}
+           </if> 
+           where 1=1
+           <if test="id!=null and id!=''">
+               and id = #{id}
+           </if>
+           <if test="name!=null and name!=''">
+               and name = #{name}
+           </if>  
+      </update>
+      
+      <select id="getQuestionList"  parameterType="java.util.Map" resultType="com.gyc.dto.question">
+          select
+          `id` as id,
+         `name` as name,
+         user_id as user_id,
+         expert_id as expert_id,
+         created_at as created_at,
+         updated_at as updated_at,
+         read_status as read_status
+         from question a
+         where a.user_id = #{user_id}
+          and a.read_status = #{read_status}
+          limit  #{limit}  offset #{offset}
+      </select>
+      
+      
+      <select id="getQuestionListNoAnswer"  parameterType="java.util.Map" resultType="com.gyc.dto.question">
+          select
+          `id` as id,
+         `name` as name,
+         read_status as read_status,
+         user_id as user_id,
+         expert_id as expert_id,
+         (select c.name  from expert c where c.id=a.expert_id limit 1)  as expert_name,
+         created_at as created_at,
+         updated_at as updated_at
+         from question a
+         where a.user_id = #{userId}
+         and not exists(
+          select 1 from question_detail b where b.question_id = a.id
+          )
+          limit  #{limit}  offset #{offset}
+      </select>
+      
+        <select id="getQuestionListWithAnswer" parameterType="java.util.Map"  resultType="com.gyc.dto.question">
+          select
+          `id` as id,
+         `name` as name,
+         read_status as read_status,
+         user_id as user_id,
+         expert_id as expert_id,
+         (select c.name  from expert c where c.id=a.expert_id limit 1)  as expert_name,
+         created_at as created_at,
+         updated_at as updated_at
+         from question a
+         where a.user_id = #{userId}
+         and exists(
+          select 1 from question_detail b where b.question_id = a.id
+          )
+           limit  #{limit}  offset #{offset}
+      </select>
+      
+      
+          <select id="getNeedAnswerListNoAnswer"  parameterType="java.util.Map" resultType="com.gyc.dto.question">
+          select
+          `id` as id,
+         `name` as name,
+         read_status as read_status,
+         user_id as user_id,
+         expert_id as expert_id,
+         (select c.name  from expert c where c.id=a.expert_id limit 1)  as expert_name,
+         created_at as created_at,
+         updated_at as updated_at
+         from question a
+         where a.expert_id = #{expertId}
+         and not exists(
+          select 1 from question_detail b where b.question_id = a.id
+          )
+           limit  #{limit}  offset #{offset}
+      </select>
+      
+        <select id="getNeedAnswerListWithAnswer" parameterType="java.util.Map"  resultType="com.gyc.dto.question">
+          select
+          `id` as id,
+         `name` as name,
+         read_status as read_status,
+         user_id as user_id,
+         expert_id as expert_id,
+         (select c.name  from expert c where c.id=a.expert_id limit 1)  as expert_name,
+         created_at as created_at,
+         updated_at as updated_at
+         from question a
+         where a.expert_id = #{expertId}
+         and exists(
+          select 1 from question_detail b where b.question_id = a.id
+          )
+         limit  #{limit}  offset #{offset}
+      </select>
+      
+      
+      <insert id="saveQuestion" parameterType="com.gyc.dto.question">
+          insert into question(
+              name,
+              user_id,
+              expert_id,
+              read_status,
+              created_at,
+              updated_at
+              )values(
+             #{name,jdbcType=VARCHAR},
+             #{user_id,jdbcType=INTEGER},
+             #{expert_id,jdbcType=INTEGER},
+             #{read_status,jdbcType=VARCHAR},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert> 
+      
+       <update id="updateQuestion" parameterType="com.gyc.dto.question">
+           update question 
+           set read_status = #{read_status}
+           <if test="updated_at!=null and updated_at!=''">  
+               ,updated_at = #{updated_at}
+           </if>      
+           where id = #{id}
+      </update>
+      
+      <insert id="saveAnswer" parameterType="com.gyc.dto.questionDetail">
+          insert into question_detail(
+              question_id,
+              description,
+              answer_id,
+              type,
+              created_at,
+              updated_at
+              )values(
+             #{question_id,jdbcType=INTEGER},
+             #{description,jdbcType=VARCHAR},
+             #{answer_id,jdbcType=INTEGER},
+             #{type,jdbcType=INTEGER},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert> 
+      
+      
+      <select id="getQuestionDetail"  parameterType="java.lang.String" resultType="java.util.Map">
+         select
+          `id` as id,
+         `name` as name,
+         user_id as user_id,
+         expert_id as expert_id,
+         (select c.name  from expert c where c.id=a.expert_id limit 1)  as expert_name,
+         (select c.description  from expert c where c.id=a.expert_id limit 1)  as expert_description,
+         (select b.description   from question_detail b where b.question_id = a.id limit 1) as answer_description,
+         created_at as created_at,
+         updated_at as updated_at
+         from question a
+         where a.id = #{id}
+         limit 1
+      </select>
+      
+  
+</mapper>

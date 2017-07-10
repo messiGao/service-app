@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gyc.yanpan.mapper.YanPanMapper">
+      
+      <insert id="saveYanPanProgram" parameterType="com.gyc.dto.yanpan">
+           insert into tbl_yanpan
+           (
+            user_id,
+            `name`,
+            `desc`,
+            area_id,
+            updated_at,
+            created_at)
+            values
+           (
+             #{user_id,jdbcType=VARCHAR},
+             #{name,jdbcType=VARCHAR},
+             #{desc,jdbcType=VARCHAR},
+             #{area_id,jdbcType=VARCHAR},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert>      
+      
+      <select id="getYanPanProgramList" parameterType="java.util.Map" resultType="com.gyc.dto.yanpan">
+           select id as id,
+           name as name,
+           `desc` as `desc`,
+           area_id as area_id,
+           user_id as user_id,
+           status as status,
+           admin_id as admin_id,
+           reply_at as reply_at,
+           reply_desc as reply_desc,
+           created_at as created_at,
+           updated_at as updated_at,
+           read_status as read_status
+           from tbl_yanpan
+           where 1=1
+           <if test="id!=null and id!=''">
+               and id = #{id}
+           </if>
+           <if test="name!=null and name!=''">
+               and name = #{name}
+           </if> 
+           <if test="updated_at!=null and updated_at!=''">
+               and updated_at = #{updated_at}
+           </if>  
+           <if test="user_id!=null and user_id!=''">
+               and user_id = #{user_id}
+           </if>
+           <if test="status!=null and status!=''">
+               and status = #{status}
+           </if>   
+           <if test="read_status!=null and read_status!=''">
+               and read_status = #{read_status}
+           </if> 
+           limit #{limit} offset #{offset}
+      </select>
+      
+        <insert id="saveYanPanFile" parameterType="com.gyc.dto.yanpanFile">
+           insert into tbl_yanpan_files
+           (
+            yanpan_id,
+            `type`,
+            file_type,
+            src,
+            updated_at,
+            created_at)
+            values
+           (
+             #{yanpan_id,jdbcType=INTEGER},
+             #{type,jdbcType=INTEGER},
+             #{file_type,jdbcType=VARCHAR},
+             #{src,jdbcType=VARCHAR},
+             #{updated_at,jdbcType=INTEGER},
+             #{created_at,jdbcType=INTEGER}
+            )
+      </insert> 
+      
+      <select id="getYanPanFileList" parameterType="java.lang.Integer" resultType="com.gyc.dto.yanpanFile">
+           select id as id,
+           yanpan_id as yanpan_id,
+           file_type as file_type,
+           type as type,
+           src as src,
+           created_at as created_at,
+           updated_at as updated_at
+           from tbl_yanpan_files
+           where 1=1
+           <if test="_parameter != null">
+            and yanpan_id = #{_parameter,jdbcType=INTEGER}
+        </if>
+           limit 100
+      </select>
+      
+      <update id="updateYanPan" parameterType="com.gyc.dto.yanpan">
+           update tbl_yanpan
+           set read_status = #{read_status}
+           where id = #{id}
+      </update>
+  
+      
+</mapper>
